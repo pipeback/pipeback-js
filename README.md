@@ -17,9 +17,9 @@ pnpm add @pipeback/pipeback-js
 ### Auto-initialization (default)
 
 ```javascript
-import { createPipeback } from '@pipeback/pipeback-js';
+import Pipeback from '@pipeback/pipeback-js';
 
-const pipeback = createPipeback({
+const pipeback = Pipeback({
   workspaceId: 'YOUR_PIPEBACK_WORKSPACE_ID',
   init: true, // Optional: default is true
   user: {
@@ -54,9 +54,9 @@ pipeback.hide();
 ### Manual initialization
 
 ```javascript
-import { createPipeback } from '@pipeback/pipeback-js';
+import Pipeback from '@pipeback/pipeback-js';
 
-const pipeback = createPipeback({
+const pipeback = Pipeback({
   workspaceId: 'YOUR_PIPEBACK_WORKSPACE_ID',
   init: false, // Disable auto-initialization
   user: {
@@ -129,11 +129,11 @@ Initialize and load the Pipeback widget. By default, this is called automaticall
 
 ```typescript
 // Auto-initialization (default)
-const pipeback = createPipeback({ workspaceId: 'xxx' });
+const pipeback = Pipeback({ workspaceId: 'xxx' });
 // Widget is ready to use!
 
 // Manual initialization (opt-in)
-const pipeback = createPipeback({
+const pipeback = Pipeback({
   workspaceId: 'xxx',
   init: false
 });
@@ -217,7 +217,7 @@ pipeback.navigate('newsPost', 'post-uuid');
 You can pass any custom attributes to track user information:
 
 ```javascript
-const pipeback = createPipeback({
+const pipeback = Pipeback({
   workspaceId: 'YOUR_WORKSPACE_ID',
   user: {
     id: 'user-123',
@@ -240,7 +240,7 @@ const pipeback = createPipeback({
 For production environments, you should use the `signature` field to verify user identity:
 
 ```javascript
-const pipeback = createPipeback({
+const pipeback = Pipeback({
   workspaceId: 'YOUR_WORKSPACE_ID',
   user: {
     id: 'user-123',
@@ -258,23 +258,19 @@ The signature should be generated on your backend using HMAC-SHA256 with your Pi
 This package is written in TypeScript and includes full type definitions.
 
 ```typescript
-import {
-  createPipeback,
-  PipebackConfig,
-  PipebackUser,
-  PipebackInstance
-} from '@pipeback/pipeback-js';
+import Pipeback, { type PipebackInstance } from '@pipeback/pipeback-js';
 
-const config: PipebackConfig = {
+const pipeback: PipebackInstance = Pipeback({
   workspaceId: 'YOUR_WORKSPACE_ID',
   user: {
     id: 'user-123',
     name: 'John Doe',
     email: 'john@example.com'
   }
-};
+});
 
-const pipeback: PipebackInstance = createPipeback(config);
+// TypeScript infers all types automatically!
+pipeback.open();
 ```
 
 ## License

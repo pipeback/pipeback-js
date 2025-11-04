@@ -1,26 +1,14 @@
 import type {
   PipebackConfig,
-  PipebackUser,
-  PipebackInstance,
-  PipebackCallbacks,
-  PipebackUserCompany,
-  PipebackUserAttributes,
-  NavigateSection,
-  NavigateWithParam
+  PipebackInstance
 } from './types';
 
 export type {
   PipebackConfig,
-  PipebackUser,
-  PipebackInstance,
-  PipebackCallbacks,
-  PipebackUserCompany,
-  PipebackUserAttributes,
-  NavigateSection,
-  NavigateWithParam
+  PipebackInstance
 };
 
-class Pipeback implements PipebackInstance {
+class PipebackClass implements PipebackInstance {
   private config: PipebackConfig;
   private scriptLoaded: boolean = false;
   private initialized: boolean = false;
@@ -185,7 +173,11 @@ class Pipeback implements PipebackInstance {
  * @example
  * Auto-initialize (default):
  * ```typescript
- * const pipeback = createPipeback({
+ * import Pipeback from '@pipeback/pipeback-js';
+ * // or
+ * import { Pipeback } from '@pipeback/pipeback-js';
+ *
+ * const pipeback = Pipeback({
  *   workspaceId: 'your-workspace-id',
  *   user: {
  *     id: 'user-123',
@@ -199,7 +191,7 @@ class Pipeback implements PipebackInstance {
  *
  * Manual initialization:
  * ```typescript
- * const pipeback = createPipeback({
+ * const pipeback = Pipeback({
  *   workspaceId: 'your-workspace-id',
  *   init: false,
  *   user: {
@@ -214,8 +206,11 @@ class Pipeback implements PipebackInstance {
  * pipeback.open();
  * ```
  */
-export function createPipeback(config: PipebackConfig): PipebackInstance {
-  return new Pipeback(config);
+function Pipeback(config: PipebackConfig): PipebackInstance {
+  return new PipebackClass(config);
 }
 
+// Export as both default and named export
 export default Pipeback;
+export { Pipeback };
+

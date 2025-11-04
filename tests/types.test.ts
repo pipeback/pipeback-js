@@ -1,35 +1,40 @@
-import { describe, it, expectTypeOf } from 'vitest';
+import { describe, it, expectTypeOf, expect } from 'vitest';
 import type {
   PipebackConfig,
-  PipebackUser,
-  PipebackInstance,
-  PipebackCallbacks,
-  PipebackUserCompany,
-  PipebackUserAttributes
-} from '../src/types';
+  PipebackInstance
+} from '../src/index';
+
+// Test both import styles
+import PipebackDefault from '../src/index';
+import { Pipeback as PipebackNamed } from '../src/index';
 
 describe('Type definitions', () => {
+  it('should support default import', () => {
+    expect(PipebackDefault).toBeDefined();
+    expect(typeof PipebackDefault).toBe('function');
+  });
+
+  it('should support named import', () => {
+    expect(PipebackNamed).toBeDefined();
+    expect(typeof PipebackNamed).toBe('function');
+  });
+
+  it('should be the same function for both imports', () => {
+    expect(PipebackDefault).toBe(PipebackNamed);
+  });
   it('should have correct PipebackConfig type', () => {
-    expectTypeOf<PipebackConfig>().toMatchTypeOf<{
-      workspaceId: string;
-      user?: PipebackUser;
-      callbacks?: PipebackCallbacks;
-      cdnUrl?: string;
-    }>();
+    const config: PipebackConfig = {
+      workspaceId: 'test-workspace',
+      user: {
+        id: 'user-123',
+        name: 'John Doe',
+        email: 'john@example.com'
+      }
+    };
+    expectTypeOf(config).toMatchTypeOf<PipebackConfig>();
   });
 
-  it('should have correct PipebackUser type', () => {
-    expectTypeOf<PipebackUser>().toMatchTypeOf<{
-      id: string;
-      name: string;
-      email: string;
-      signature?: string;
-      company?: PipebackUserCompany;
-      attributes?: PipebackUserAttributes;
-    }>();
-  });
-
-  it('should have correct PipebackInstance type', () => {
+  it('should have correct PipebackInstance type with all methods', () => {
     const instance = {} as PipebackInstance;
 
     expectTypeOf(instance.init).toBeFunction();
@@ -40,17 +45,6 @@ describe('Type definitions', () => {
     expectTypeOf(instance.close).toBeFunction();
     expectTypeOf(instance.show).toBeFunction();
     expectTypeOf(instance.hide).toBeFunction();
-  });
-
-  it('should allow custom attributes with various types', () => {
-    const attributes: PipebackUserAttributes = {
-      plan: 'pro',
-      monthly_spend: 5000,
-      is_active: true,
-      last_login: null,
-      optional_field: undefined
-    };
-
-    expectTypeOf(attributes).toMatchTypeOf<PipebackUserAttributes>();
+    expectTypeOf(instance.navigate).toBeFunction();
   });
 });

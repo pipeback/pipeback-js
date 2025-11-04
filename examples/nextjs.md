@@ -8,13 +8,13 @@ Create a client component:
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { createPipeback } from '@pipeback/pipeback-js';
+import Pipeback from '@pipeback/pipeback-js';
 
 export default function PipebackWidget() {
   const pipebackRef = useRef(null);
 
   useEffect(() => {
-    pipebackRef.current = createPipeback({
+    pipebackRef.current = Pipeback({
       workspaceId: process.env.NEXT_PUBLIC_PIPEBACK_WORKSPACE_ID,
       user: {
         id: 'user-123',
@@ -52,13 +52,13 @@ export default function PipebackWidget() {
 
 ```tsx
 import { useEffect, useRef } from 'react';
-import { createPipeback } from '@pipeback/pipeback-js';
+import Pipeback from '@pipeback/pipeback-js';
 
 export default function Home() {
   const pipebackRef = useRef(null);
 
   useEffect(() => {
-    pipebackRef.current = createPipeback({
+    pipebackRef.current = Pipeback({
       workspaceId: process.env.NEXT_PUBLIC_PIPEBACK_WORKSPACE_ID,
       user: {
         id: 'user-123',

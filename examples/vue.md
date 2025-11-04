@@ -3,12 +3,12 @@
 ```vue
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { createPipeback } from '@pipeback/pipeback-js';
+import Pipeback from '@pipeback/pipeback-js';
 
 let pipeback = null;
 
 onMounted(() => {
-  pipeback = createPipeback({
+  pipeback = Pipeback({
     workspaceId: 'YOUR_WORKSPACE_ID',
     user: {
       id: 'user-123',

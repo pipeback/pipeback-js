@@ -367,7 +367,7 @@
   </div>
 
   <script type="module">
-    import { createPipeback } from '../src/index.ts';
+    import Pipeback from '../src/index.ts';
 
     let pipeback = null;
 
@@ -419,7 +419,7 @@
 
         log('Config: ' + JSON.stringify(config, null, 2), 'info');
 
-        pipeback = createPipeback(config);
+        pipeback = Pipeback(config);
 
         if (!autoInit) {
           log('Initializing manually...', 'info');

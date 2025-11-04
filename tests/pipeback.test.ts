@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { createPipeback } from '../src/index';
+import Pipeback from '../src/index';
 import type { PipebackConfig } from '../src/types';
 
 describe('Pipeback SDK', () => {
@@ -16,9 +16,9 @@ describe('Pipeback SDK', () => {
     vi.clearAllMocks();
   });
 
-  describe('createPipeback', () => {
+  describe('Pipeback', () => {
     it('should create a Pipeback instance', () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -33,14 +33,14 @@ describe('Pipeback SDK', () => {
 
     it('should throw error if workspaceId is missing', () => {
       expect(() => {
-        createPipeback({} as PipebackConfig);
+        Pipeback({} as PipebackConfig);
       }).toThrow('workspaceId is required');
     });
   });
 
   describe('init', () => {
     it('should set PIPEBACK_ID on window', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace-123'
       });
 
@@ -64,7 +64,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should set user data on window.$pipeback', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace',
         user: {
           id: 'user-123',
@@ -119,7 +119,7 @@ describe('Pipeback SDK', () => {
       const onShow = vi.fn();
       const onHide = vi.fn();
 
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace',
         callbacks: {
           onLoaded,
@@ -154,7 +154,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should only initialize once', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -183,7 +183,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should load script from CDN', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -212,7 +212,7 @@ describe('Pipeback SDK', () => {
 
   describe('isReady', () => {
     it('should return false before initialization', () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -220,7 +220,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should return true after widget is loaded', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -252,7 +252,7 @@ describe('Pipeback SDK', () => {
 
   describe('Widget methods', () => {
     it('should call window.$pipeback.open when open is called', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -280,7 +280,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should call window.$pipeback.close when close is called', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -308,7 +308,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should call window.$pipeback.show when show is called', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -337,7 +337,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should call window.$pipeback.hide when hide is called', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -366,7 +366,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should warn when calling methods before ready', () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -379,7 +379,7 @@ describe('Pipeback SDK', () => {
 
   describe('navigate method', () => {
     it('should call window.$pipeback.navigate with section only', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -408,7 +408,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should call window.$pipeback.navigate with section and param', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -437,7 +437,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should navigate to helpArticle with article ID', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -466,7 +466,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should navigate to newsPost with post ID', async () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -495,7 +495,7 @@ describe('Pipeback SDK', () => {
     });
 
     it('should warn when calling navigate before ready', () => {
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace'
       });
 
@@ -509,7 +509,7 @@ describe('Pipeback SDK', () => {
   describe('Custom CDN URL', () => {
     it('should use custom CDN URL if provided', async () => {
       const customCdn = 'https://custom-cdn.example.com/widget.js';
-      const pipeback = createPipeback({
+      const pipeback = Pipeback({
         workspaceId: 'test-workspace',
         cdnUrl: customCdn
       });

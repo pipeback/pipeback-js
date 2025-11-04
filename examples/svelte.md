@@ -3,12 +3,12 @@
 ```svelte
 <script>
   import { onMount } from 'svelte';
-  import { createPipeback } from '@pipeback/pipeback-js';
+  import Pipeback from '@pipeback/pipeback-js';
 
   let pipeback = null;
 
   onMount(() => {
-    pipeback = createPipeback({
+    pipeback = Pipeback({
       workspaceId: 'YOUR_WORKSPACE_ID',
       user: {
         id: 'user-123',

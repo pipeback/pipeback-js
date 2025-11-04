@@ -2,13 +2,13 @@
 
 ```tsx
 import { useEffect, useRef } from 'react';
-import { createPipeback } from '@pipeback/pipeback-js';
+import Pipeback from '@pipeback/pipeback-js';
 
 function App() {
   const pipebackRef = useRef(null);
 
   useEffect(() => {
-    pipebackRef.current = createPipeback({
+    pipebackRef.current = Pipeback({
       workspaceId: 'YOUR_WORKSPACE_ID',
       user: {
         id: 'user-123',

@@ -2,7 +2,7 @@
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
-import { createPipeback, PipebackInstance } from '@pipeback/pipeback-js';
+import Pipeback, { PipebackInstance } from '@pipeback/pipeback-js';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
   private pipeback: PipebackInstance | null = null;
 
   ngOnInit() {
-    this.pipeback = createPipeback({
+    this.pipeback = Pipeback({
       workspaceId: 'YOUR_WORKSPACE_ID',
       user: {
         id: 'user-123',

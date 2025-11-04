@@ -59,7 +59,7 @@
   <pre id="log"></pre>
 
   <script type="module">
-    import { createPipeback } from './dist/pipeback.esm.js';
+    import Pipeback from './dist/pipeback.esm.js';
 
     let pipeback = null;
 
@@ -67,7 +67,7 @@
       try {
         log('Creating Pipeback instance...');
 
-        pipeback = createPipeback({
+        pipeback = Pipeback({
           workspaceId: 'YOUR_WORKSPACE_ID', // Change this to your workspace ID
           user: {
             id: '9f7618a2',

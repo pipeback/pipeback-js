@@ -3,7 +3,7 @@
 Create `plugins/pipeback.client.ts`:
 
 ```typescript
-import { createPipeback } from '@pipeback/pipeback-js';
+import Pipeback from '@pipeback/pipeback-js';
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
@@ -17,7 +17,7 @@ export default defineNuxtPlugin(() => {
 
   watchEffect(() => {
     if (user.value && workspace.value && !pipeback) {
-      pipeback = createPipeback({
+      pipeback = Pipeback({
         workspaceId: config.public.pipebackId,
         user: {
           id: user.value.id,
