@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipeback JS SDK - Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    button {
+      background: #4F46E5;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 8px;
+    }
+    button:hover {
+      background: #4338CA;
+    }
+    .status {
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 8px;
+      background: #F3F4F6;
+    }
+    pre {
+      background: #1F2937;
+      color: #F9FAFB;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>@pipeback/pipeback-js - Test</h1>
+
+  <div class="status">
+    <strong>Status:</strong> <span id="status">Not initialized</span>
+  </div>
+
+  <div>
+    <button onclick="initPipeback()">Initialize Pipeback</button>
+    <button onclick="openWidget()">Open Widget</button>
+    <button onclick="closeWidget()">Close Widget</button>
+    <button onclick="showWidget()">Show Widget</button>
+    <button onclick="hideWidget()">Hide Widget</button>
+    <button onclick="shutdownWidget()">Shutdown Widget</button>
+  </div>
+
+  <h2>Console Log</h2>
+  <pre id="log"></pre>
+
+  <script type="module">
+    import { createPipeback } from './dist/pipeback.esm.js';
+
+    let pipeback = null;
+
+    window.initPipeback = async function() {
+      try {
+        log('Creating Pipeback instance...');
+
+        pipeback = createPipeback({
+          workspaceId: 'YOUR_WORKSPACE_ID', // Change this to your workspace ID
+          user: {
+            id: '9f7618a2',
+            name: 'Test User',
+            email: 'test@example.com',
+            company: {
+              id: '8f4618a2',
+              name: 'Test Company',
+              website: 'test.com'
+            },
+            attributes: {
+              plan: 'pro',
+              monthly_spend: 5000,
+              test: true
+            }
+          },
+          callbacks: {
+            onLoaded: () => log('✅ Callback: Widget loaded'),
+            onOpen: () => log('✅ Callback: Widget opened'),
+            onClose: () => log('✅ Callback: Widget closed'),
+            onShow: () => log('✅ Callback: Widget shown'),
+            onHide: () => log('✅ Callback: Widget hidden'),
+          },
+          autoHide: true
+        });
+
+        log('Initializing...');
+        await pipeback.init();
+
+        updateStatus('Initialized ✅');
+        log('✅ Pipeback initialized successfully!');
+        log(`Ready: ${pipeback.isReady()}`);
+      } catch (error) {
+        log('❌ Error: ' + error.message);
+        updateStatus('Error ❌');
+      }
+    };
+
+    window.openWidget = function() {
+      if (!pipeback) {
+        log('❌ Please initialize first');
+        return;
+      }
+      log('Opening widget...');
+      pipeback.open();
+    };
+
+    window.closeWidget = function() {
+      if (!pipeback) {
+        log('❌ Please initialize first');
+        return;
+      }
+      log('Closing widget...');
+      pipeback.close();
+    };
+
+    window.showWidget = function() {
+      if (!pipeback) {
+        log('❌ Please initialize first');
+        return;
+      }
+      log('Showing widget...');
+      pipeback.show();
+    };
+
+    window.hideWidget = function() {
+      if (!pipeback) {
+        log('❌ Please initialize first');
+        return;
+      }
+      log('Hiding widget...');
+      pipeback.hide();
+    };
+
+    window.shutdownWidget = function() {
+      if (!pipeback) {
+        log('❌ Please initialize first');
+        return;
+      }
+      log('Shutting down widget...');
+      pipeback.shutdown();
+      pipeback = null;
+      updateStatus('Shutdown ⭕️');
+      log('✅ Widget shutdown complete');
+    };
+
+    function log(message) {
+      const logElement = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      logElement.textContent += `[${timestamp}] ${message}\n`;
+      logElement.scrollTop = logElement.scrollHeight;
+      console.log(message);
+    }
+
+    function updateStatus(status) {
+      document.getElementById('status').textContent = status;
+    }
+
+    log('Page loaded. Click "Initialize Pipeback" to start.');
+  </script>
+</body>
+</html>

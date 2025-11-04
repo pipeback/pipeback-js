@@ -1,0 +1,42 @@
+{
+  "name": "@pipeback/pipeback-js",
+  "version": "1.0.0",
+  "description": "Official Pipeback JavaScript SDK - Works with React, Vue, Angular, and vanilla JS",
+  "type": "module",
+  "main": "dist/pipeback.cjs.js",
+  "module": "dist/pipeback.esm.js",
+  "browser": "dist/pipeback.umd.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "pipeback",
+    "customer-support",
+    "chat",
+    "widget",
+    "sdk",
+    "vue",
+    "react",
+    "angular",
+    "messenger"
+  ],
+  "author": "Pipeback",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pipeback/pipeback-js"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.9.6",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3"
+  }
+}
