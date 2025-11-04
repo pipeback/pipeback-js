@@ -214,7 +214,7 @@ class Pipeback implements PipebackInstance {
  * pipeback.open();
  * ```
  */
-export function createPipeback(config: PipebackConfig): Pipeback {
+export function createPipeback(config: PipebackConfig): PipebackInstance {
   return new Pipeback(config);
 }
 

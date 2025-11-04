@@ -1,6 +1,6 @@
 {
   "name": "@pipeback/pipeback-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official Pipeback JavaScript SDK - Works with React, Vue, Angular, and vanilla JS",
   "type": "module",
   "main": "dist/pipeback.cjs.js",
