@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipeback SDK - Development Console</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #21262d;
+      --border-color: #30363d;
+      --text-primary: #c9d1d9;
+      --text-secondary: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --success: #3fb950;
+      --error: #f85149;
+      --warning: #d29922;
+      --code-bg: #161b22;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--error);
+    }
+
+    .status-indicator.ready {
+      background: var(--success);
+    }
+
+    .panel-content {
+      padding: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+
+    textarea.form-input {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    .checkbox-group label {
+      font-size: 14px;
+      color: var(--text-primary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn.btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      grid-column: 1 / -1;
+    }
+
+    .btn.btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .log-container {
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 16px;
+      height: calc(100vh - 120px);
+      overflow-y: auto;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 4px;
+      padding: 4px 0;
+    }
+
+    .log-time {
+      color: var(--text-secondary);
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .log-message {
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+
+    .log-message.info { color: var(--accent); }
+    .log-message.success { color: var(--success); }
+    .log-message.error { color: var(--error); }
+    .log-message.warning { color: var(--warning); }
+
+    .divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 16px 0;
+    }
+
+    .mono {
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-tertiary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #484f58;
+    }
+
+    @media (max-width: 1200px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .log-container {
+        height: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left Panel: Configuration -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="status-indicator" id="statusIndicator"></span>
+          <span>Configuration</span>
+        </div>
+        <span class="mono" style="font-size: 11px; color: var(--text-secondary);" id="statusText">Not initialized</span>
+      </div>
+
+      <div class="panel-content">
+        <!-- Workspace -->
+        <div class="form-group">
+          <label class="form-label">Workspace ID</label>
+          <input type="text" class="form-input" id="workspaceId" placeholder="your-workspace-id">
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- User Info -->
+        <div class="form-group">
+          <label class="form-label">User ID</label>
+          <input type="text" class="form-input" id="userId" placeholder="user-123">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">User Name</label>
+          <input type="text" class="form-input" id="userName" placeholder="John Doe">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">User Email</label>
+          <input type="email" class="form-input" id="userEmail" placeholder="user@example.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Signature (HMAC-SHA256)</label>
+          <input type="text" class="form-input" id="userSignature" placeholder="Optional">
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Company Info -->
+        <div class="form-group">
+          <label class="form-label">Company ID</label>
+          <input type="text" class="form-input" id="companyId" placeholder="company-123">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Company Name</label>
+          <input type="text" class="form-input" id="companyName" placeholder="Acme Inc">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Company Website</label>
+          <input type="text" class="form-input" id="companyWebsite" placeholder="example.com">
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Custom Attributes -->
+        <div class="form-group">
+          <label class="form-label">Custom Attributes (JSON)</label>
+          <textarea class="form-input" id="userAttributes" placeholder='{"plan": "pro", "monthly_spend": 5000}'></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Options -->
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="autoInit" checked>
+            <label for="autoInit">Auto-initialize on creation</label>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="btn-grid">
+          <button class="btn btn-primary" onclick="initPipeback()">Initialize Widget</button>
+          <button class="btn" onclick="openWidget()">open()</button>
+          <button class="btn" onclick="closeWidget()">close()</button>
+          <button class="btn" onclick="showWidget()">show()</button>
+          <button class="btn" onclick="hideWidget()">hide()</button>
+          <button class="btn" onclick="checkReady()">isReady()</button>
+          <button class="btn" onclick="navHome()">navigate('home')</button>
+          <button class="btn" onclick="navMessages()">navigate('messages')</button>
+          <button class="btn" onclick="navHelp()">navigate('help')</button>
+          <button class="btn" onclick="navNews()">navigate('news')</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Console -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Console Output</div>
+        <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="clearLog()">Clear</button>
+      </div>
+      <div class="panel-content" style="padding: 0;">
+        <div class="log-container" id="logContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createPipeback } from '../src/index.ts';
+
+    let pipeback = null;
+
+    window.initPipeback = async function() {
+      try {
+        const workspaceId = document.getElementById('workspaceId').value;
+        const userId = document.getElementById('userId').value;
+        const userName = document.getElementById('userName').value;
+        const userEmail = document.getElementById('userEmail').value;
+        const userSignature = document.getElementById('userSignature').value;
+        const companyId = document.getElementById('companyId').value;
+        const companyName = document.getElementById('companyName').value;
+        const companyWebsite = document.getElementById('companyWebsite').value;
+        const autoInit = document.getElementById('autoInit').checked;
+
+        let attributes = {};
+        try {
+          const attributesText = document.getElementById('userAttributes').value;
+          attributes = attributesText ? JSON.parse(attributesText) : {};
+        } catch (e) {
+          log('Invalid JSON in attributes, using empty object', 'error');
+        }
+
+        log('Creating Pipeback instance...', 'info');
+
+        const config = {
+          workspaceId,
+          init: autoInit,
+          user: {
+            id: userId,
+            name: userName,
+            email: userEmail,
+            ...(userSignature && { signature: userSignature }),
+            company: {
+              id: companyId,
+              name: companyName,
+              ...(companyWebsite && { website: companyWebsite })
+            },
+            attributes
+          },
+          callbacks: {
+            onLoaded: () => log('✓ Widget loaded', 'success'),
+            onOpen: () => log('✓ Widget opened', 'success'),
+            onClose: () => log('✓ Widget closed', 'success'),
+            onShow: () => log('✓ Widget shown', 'success'),
+            onHide: () => log('✓ Widget hidden', 'success'),
+          }
+        };
+
+        log('Config: ' + JSON.stringify(config, null, 2), 'info');
+
+        pipeback = createPipeback(config);
+
+        if (!autoInit) {
+          log('Initializing manually...', 'info');
+          await pipeback.init();
+        } else {
+          log('Auto-initialized', 'success');
+        }
+
+        updateStatus(true);
+        log('✓ Pipeback initialized successfully', 'success');
+        log('Ready: ' + pipeback.isReady(), 'info');
+      } catch (error) {
+        log('✗ Error: ' + error.message, 'error');
+        updateStatus(false);
+      }
+    };
+
+    window.openWidget = () => {
+      if (!checkPipeback()) return;
+      log('→ pipeback.open()', 'info');
+      pipeback.open();
+    };
+
+    window.closeWidget = () => {
+      if (!checkPipeback()) return;
+      log('→ pipeback.close()', 'info');
+      pipeback.close();
+    };
+
+    window.showWidget = () => {
+      if (!checkPipeback()) return;
+      log('→ pipeback.show()', 'info');
+      pipeback.show();
+    };
+
+    window.hideWidget = () => {
+      if (!checkPipeback()) return;
+      log('→ pipeback.hide()', 'info');
+      pipeback.hide();
+    };
+
+    window.checkReady = () => {
+      if (!pipeback) {
+        log('✗ Pipeback not initialized', 'error');
+        return;
+      }
+      const ready = pipeback.isReady();
+      log('→ pipeback.isReady() = ' + ready, ready ? 'success' : 'error');
+    };
+
+    window.navHome = () => {
+      if (!checkPipeback()) return;
+      log('→ pipeback.navigate("home")', 'info');
+      pipeback.navigate('home');
+    };
+
+    window.navMessages = () => {
+      if (!checkPipeback()) return;
+      log('→ pipeback.navigate("messages")', 'info');
+      pipeback.navigate('messages');
+    };
+
+    window.navHelp = () => {
+      if (!checkPipeback()) return;
+      log('→ pipeback.navigate("help")', 'info');
+      pipeback.navigate('help');
+    };
+
+    window.navNews = () => {
+      if (!checkPipeback()) return;
+      log('→ pipeback.navigate("news")', 'info');
+      pipeback.navigate('news');
+    };
+
+    window.clearLog = () => {
+      document.getElementById('logContainer').innerHTML = '';
+    };
+
+    function checkPipeback() {
+      if (!pipeback) {
+        log('✗ Please initialize first', 'error');
+        return false;
+      }
+      return true;
+    }
+
+    function log(message, type = 'default') {
+      const logContainer = document.getElementById('logContainer');
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+
+      const timeEl = document.createElement('span');
+      timeEl.className = 'log-time';
+      timeEl.textContent = time;
+
+      const msgEl = document.createElement('span');
+      msgEl.className = `log-message ${type}`;
+      msgEl.textContent = message;
+
+      entry.appendChild(timeEl);
+      entry.appendChild(msgEl);
+      logContainer.appendChild(entry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+
+      console.log(`[${time}] ${message}`);
+    }
+
+    function updateStatus(ready) {
+      const indicator = document.getElementById('statusIndicator');
+      const text = document.getElementById('statusText');
+
+      if (ready) {
+        indicator.classList.add('ready');
+        text.textContent = 'Ready';
+      } else {
+        indicator.classList.remove('ready');
+        text.textContent = 'Not initialized';
+      }
+    }
+
+    // Initial log
+    log('Development console ready', 'info');
+    log('Configure settings and click "Initialize Widget"', 'info');
+  </script>
+</body>
+</html>

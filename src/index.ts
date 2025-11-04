@@ -4,7 +4,9 @@ import type {
   PipebackInstance,
   PipebackCallbacks,
   PipebackUserCompany,
-  PipebackUserAttributes
+  PipebackUserAttributes,
+  NavigateSection,
+  NavigateWithParam
 } from './types';
 
 export type {
@@ -13,7 +15,9 @@ export type {
   PipebackInstance,
   PipebackCallbacks,
   PipebackUserCompany,
-  PipebackUserAttributes
+  PipebackUserAttributes,
+  NavigateSection,
+  NavigateWithParam
 };
 
 class Pipeback implements PipebackInstance {
@@ -29,9 +33,14 @@ class Pipeback implements PipebackInstance {
 
     this.config = {
       cdnUrl: 'https://widget.pipeback.com/l.js',
-      autoHide: false,
+      init: true, // Default to auto-init
       ...config
     };
+
+    // Auto-initialize if init is not explicitly set to false
+    if (this.config.init !== false) {
+      this.init();
+    }
   }
 
   /**
@@ -57,21 +66,6 @@ class Pipeback implements PipebackInstance {
       pipebackConfig.callbacks = { ...this.config.callbacks };
     }
 
-    // Add auto-hide functionality if enabled
-    if (this.config.autoHide) {
-      if (!pipebackConfig.callbacks) {
-        pipebackConfig.callbacks = {};
-      }
-
-      const originalOnLoaded = pipebackConfig.callbacks.onLoaded;
-      pipebackConfig.callbacks.onLoaded = () => {
-        if (originalOnLoaded) {
-          originalOnLoaded();
-        }
-        setTimeout(() => this.hide(), 100);
-      };
-    }
-
     // Add user data if provided
     if (this.config.user) {
       pipebackConfig.user = { ...this.config.user };
@@ -90,13 +84,17 @@ class Pipeback implements PipebackInstance {
    */
   private loadScript(): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (this.scriptLoaded) {
+      if (this.scriptLoaded && this.scriptElement) {
         resolve();
         return;
       }
 
+      // Remove any existing script with the same src
+      const existingScripts = document.querySelectorAll(`script[src="${this.config.cdnUrl}"]`);
+      existingScripts.forEach(s => s.remove());
+
       const script = document.createElement('script');
-      script.src = this.config.cdnUrl!;
+      script.src = `${this.config.cdnUrl}?t=${Date.now()}`; // Cache buster
       script.async = true;
 
       script.onload = () => {
@@ -167,71 +165,51 @@ class Pipeback implements PipebackInstance {
   }
 
   /**
-   * Update user information
+   * Navigate to a specific section of the messenger
+   * @param section - The section to navigate to
+   * @param param - Optional parameter (for newMessage, helpArticle, newsPost)
    */
-  public update(data: { user: PipebackUser }): void {
-    this.config.user = data.user;
-
-    if (this.isReady() && typeof window.$pipeback.update === 'function') {
-      window.$pipeback.update(data);
-    } else if (window.$pipeback) {
-      // If update method doesn't exist, update the user object directly
-      window.$pipeback.user = data.user;
+  public navigate(section: string, param?: string): void {
+    if (this.isReady()) {
+      window.$pipeback.navigate(section, param);
+    } else {
+      console.warn('Pipeback widget is not ready yet. Call init() first.');
     }
   }
 
-  /**
-   * Shutdown and cleanup
-   */
-  public shutdown(): void {
-    if (typeof window !== 'undefined') {
-      if (this.isReady()) {
-        this.hide();
-      }
-
-      // Remove script element
-      if (this.scriptElement && this.scriptElement.parentNode) {
-        this.scriptElement.parentNode.removeChild(this.scriptElement);
-        this.scriptElement = null;
-      }
-
-      delete window.$pipeback;
-      delete window.PIPEBACK_ID;
-    }
-
-    this.initialized = false;
-    this.scriptLoaded = false;
-  }
 }
 
 /**
  * Create and initialize a new Pipeback instance
  *
  * @example
+ * Auto-initialize (default):
  * ```typescript
  * const pipeback = createPipeback({
  *   workspaceId: 'your-workspace-id',
  *   user: {
  *     id: 'user-123',
  *     name: 'John Doe',
- *     email: 'john@example.com',
- *     company: {
- *       id: 'company-123',
- *       name: 'Acme Inc',
- *       website: 'acme.com'
- *     },
- *     attributes: {
- *       plan: 'pro',
- *       monthly_spend: 5000
- *     }
- *   },
- *   callbacks: {
- *     onLoaded: () => console.log('Widget loaded'),
- *     onOpen: () => console.log('Widget opened')
- *   },
- *   autoHide: true
+ *     email: 'john@example.com'
+ *   }
+ * });
+ * // Widget automatically initializes
+ * pipeback.open();
+ * ```
+ *
+ * Manual initialization:
+ * ```typescript
+ * const pipeback = createPipeback({
+ *   workspaceId: 'your-workspace-id',
+ *   init: false,
+ *   user: {
+ *     id: 'user-123',
+ *     name: 'John Doe',
+ *     email: 'john@example.com'
+ *   }
  * });
  *
+ * // Later, when ready:
  * await pipeback.init();
  * pipeback.open();
  * ```

@@ -29,22 +29,21 @@ export interface PipebackConfig {
   workspaceId: string;
   user?: PipebackUser;
   callbacks?: PipebackCallbacks;
-  autoHide?: boolean;
   cdnUrl?: string;
+  init?: boolean; // Auto-initialize on creation (default: true)
 }
 
-export interface PipebackWidgetApi {
+export type NavigateSection = 'home' | 'messages' | 'help' | 'news';
+export type NavigateWithParam = 'newMessage' | 'helpArticle' | 'newsPost';
+
+export interface PipebackInstance {
+  init: () => Promise<void>;
+  isReady: () => boolean;
   open: () => void;
   close: () => void;
   show: () => void;
   hide: () => void;
-  update: (data: { user: PipebackUser }) => void;
-  shutdown: () => void;
-}
-
-export interface PipebackInstance extends PipebackWidgetApi {
-  init: () => Promise<void>;
-  isReady: () => boolean;
+  navigate: (section: NavigateSection | NavigateWithParam, param?: string) => void;
 }
 
 declare global {

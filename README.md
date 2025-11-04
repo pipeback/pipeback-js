@@ -1,6 +1,6 @@
 # @pipeback/pipeback-js
 
-Official Pipeback JavaScript SDK - Works with React, Vue, Angular, Svelte, and vanilla JavaScript.
+Official Pipeback JavaScript SDK - Works with React, Vue, Angular, Svelte, Next.js, Nuxt, and vanilla JavaScript.
 
 ## Installation
 
@@ -14,13 +14,14 @@ pnpm add @pipeback/pipeback-js
 
 ## Quick Start
 
-### Vanilla JavaScript
+### Auto-initialization (default)
 
 ```javascript
 import { createPipeback } from '@pipeback/pipeback-js';
 
 const pipeback = createPipeback({
   workspaceId: 'YOUR_PIPEBACK_WORKSPACE_ID',
+  init: true, // Optional: default is true
   user: {
     id: '9f7618a2',
     name: 'Paulo Castellano',
@@ -39,12 +40,9 @@ const pipeback = createPipeback({
     onLoaded: () => console.log('Widget loaded!'),
     onOpen: () => console.log('Widget opened'),
     onClose: () => console.log('Widget closed'),
-  },
-  autoHide: true // Optional: hide widget on load
+  }
 });
-
-// Initialize the widget
-await pipeback.init();
+// Automatically initializes!
 
 // Control the widget
 pipeback.open();
@@ -53,229 +51,39 @@ pipeback.show();
 pipeback.hide();
 ```
 
-### Vue 3 (Composition API)
+### Manual initialization
 
-```vue
-<script setup lang="ts">
-import { onMounted, onUnmounted, computed } from 'vue';
+```javascript
 import { createPipeback } from '@pipeback/pipeback-js';
 
-const userStore = useUserStore();
-const workspaceStore = useWorkspaceStore();
-
-const user = computed(() => userStore.user);
-const workspace = computed(() => workspaceStore.currentWorkspace);
-
-let pipeback = null;
-
-onMounted(async () => {
-  if (user.value && workspace.value) {
-    pipeback = createPipeback({
-      workspaceId: 'YOUR_WORKSPACE_ID',
-      user: {
-        id: user.value.id,
-        name: user.value.name,
-        email: user.value.email,
-        company: {
-          id: workspace.value.id,
-          name: workspace.value.name,
-          website: workspace.value.domain
-        },
-        attributes: {
-          plan: workspace.value.plan,
-        }
-      },
-      callbacks: {
-        onLoaded: () => console.log('Widget loaded'),
-      },
-      autoHide: true
-    });
-
-    await pipeback.init();
+const pipeback = createPipeback({
+  workspaceId: 'YOUR_PIPEBACK_WORKSPACE_ID',
+  init: false, // Disable auto-initialization
+  user: {
+    id: '9f7618a2',
+    name: 'Paulo Castellano',
+    email: 'paulo@pipeback.com'
   }
 });
 
-onUnmounted(() => {
-  pipeback?.shutdown();
-});
+// Initialize manually when ready
+await pipeback.init();
 
-const openSupport = () => {
-  pipeback?.open();
-};
-</script>
-
-<template>
-  <button @click="openSupport">Open Support</button>
-</template>
+// Now you can control the widget
+pipeback.open();
 ```
 
-### Nuxt 3 Plugin
+## Framework Examples
 
-```typescript
-// plugins/pipeback.client.ts
-import { createPipeback } from '@pipeback/pipeback-js';
+For framework-specific integration examples, see the [`examples/`](./examples/) directory:
 
-export default defineNuxtPlugin(() => {
-  const config = useRuntimeConfig();
-  const userStore = useUserStore();
-  const workspaceStore = useWorkspaceStore();
-
-  const user = computed(() => userStore.user);
-  const workspace = computed(() => workspaceStore.currentWorkspace);
-
-  let pipeback = null;
-
-  watchEffect(async () => {
-    if (user.value && workspace.value && !pipeback) {
-      pipeback = createPipeback({
-        workspaceId: config.public.pipebackId,
-        user: {
-          id: user.value.id,
-          name: user.value.name,
-          email: user.value.email,
-          signature: user.value.pipeback_messenger_user_hash,
-          company: {
-            id: workspace.value.id,
-            name: workspace.value.name,
-            website: workspace.value.domain
-          },
-          attributes: {
-            plan: workspace.value.plan,
-          }
-        },
-        callbacks: {
-          onLoaded: () => {
-            console.log('Pipeback loaded');
-          }
-        },
-        autoHide: true
-      });
-
-      await pipeback.init();
-    }
-  });
-
-  return {
-    provide: {
-      pipeback: () => pipeback
-    }
-  };
-});
-```
-
-Then use in your components:
-
-```vue
-<template>
-  <button @click="$pipeback()?.open()">Contact Support</button>
-</template>
-```
-
-### React
-
-```jsx
-import { useEffect, useRef } from 'react';
-import { createPipeback } from '@pipeback/pipeback-js';
-
-function App() {
-  const pipebackRef = useRef(null);
-
-  useEffect(() => {
-    const initPipeback = async () => {
-      pipebackRef.current = createPipeback({
-        workspaceId: 'YOUR_WORKSPACE_ID',
-        user: {
-          id: 'user-123',
-          name: 'John Doe',
-          email: 'john@example.com',
-          company: {
-            id: 'company-123',
-            name: 'Acme Inc',
-            website: 'acme.com'
-          },
-          attributes: {
-            plan: 'enterprise',
-            role: 'admin'
-          }
-        },
-        callbacks: {
-          onLoaded: () => console.log('Loaded'),
-          onOpen: () => console.log('Opened')
-        },
-        autoHide: true
-      });
-
-      await pipebackRef.current.init();
-    };
-
-    initPipeback();
-
-    return () => {
-      pipebackRef.current?.shutdown();
-    };
-  }, []);
-
-  const handleOpenWidget = () => {
-    pipebackRef.current?.open();
-  };
-
-  return (
-    <button onClick={handleOpenWidget}>
-      Contact Support
-    </button>
-  );
-}
-
-export default App;
-```
-
-### Angular
-
-```typescript
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { createPipeback, PipebackInstance } from '@pipeback/pipeback-js';
-
-@Component({
-  selector: 'app-root',
-  template: '<button (click)="openWidget()">Contact Support</button>'
-})
-export class AppComponent implements OnInit, OnDestroy {
-  private pipeback: PipebackInstance | null = null;
-
-  async ngOnInit() {
-    this.pipeback = createPipeback({
-      workspaceId: 'YOUR_WORKSPACE_ID',
-      user: {
-        id: 'user-123',
-        name: 'John Doe',
-        email: 'john@example.com',
-        company: {
-          id: 'company-123',
-          name: 'Acme Inc',
-          website: 'acme.com'
-        },
-        attributes: {
-          department: 'engineering'
-        }
-      },
-      callbacks: {
-        onLoaded: () => console.log('Widget ready')
-      },
-      autoHide: true
-    });
-
-    await this.pipeback.init();
-  }
-
-  ngOnDestroy() {
-    this.pipeback?.shutdown();
-  }
-
-  openWidget() {
-    this.pipeback?.open();
-  }
-}
-```
+- [Vanilla JavaScript](./examples/vanilla.md)
+- [React](./examples/react.md)
+- [Next.js](./examples/nextjs.md)
+- [Vue 3](./examples/vue.md)
+- [Nuxt 3](./examples/nuxt.md)
+- [Angular](./examples/angular.md)
+- [Svelte](./examples/svelte.md)
 
 ## API Reference
 
@@ -284,9 +92,9 @@ export class AppComponent implements OnInit, OnDestroy {
 ```typescript
 interface PipebackConfig {
   workspaceId: string;           // Required: Your Pipeback workspace ID
+  init?: boolean;                // Optional: Auto-initialize on creation (default: true)
   user?: PipebackUser;           // Optional: User information
   callbacks?: PipebackCallbacks; // Optional: Event callbacks
-  autoHide?: boolean;            // Optional: Auto-hide widget on load (default: false)
   cdnUrl?: string;               // Optional: Custom CDN URL (default: https://widget.pipeback.com/l.js)
 }
 
@@ -294,7 +102,7 @@ interface PipebackUser {
   id: string;                    // Required: User ID
   name: string;                  // Required: User name
   email: string;                 // Required: User email
-  signature?: string;            // Optional: User verification hash
+  signature?: string;            // Optional: User verification hash (HMAC-SHA256)
   company?: {
     id: string;                  // Required: Company ID
     name: string;                // Required: Company name
@@ -317,10 +125,28 @@ interface PipebackCallbacks {
 ### Methods
 
 #### `init(): Promise<void>`
-Initialize and load the Pipeback widget. Must be called before using other methods.
+Initialize and load the Pipeback widget. By default, this is called automatically when you create the instance. You only need to call this manually if you set `init: false` in the config.
 
 ```typescript
+// Auto-initialization (default)
+const pipeback = createPipeback({ workspaceId: 'xxx' });
+// Widget is ready to use!
+
+// Manual initialization (opt-in)
+const pipeback = createPipeback({
+  workspaceId: 'xxx',
+  init: false
+});
 await pipeback.init();
+```
+
+#### `isReady(): boolean`
+Check if the widget is ready to use.
+
+```typescript
+if (pipeback.isReady()) {
+  pipeback.open();
+}
 ```
 
 #### `open(): void`
@@ -351,36 +177,39 @@ Hide the widget (makes it invisible but keeps it loaded).
 pipeback.hide();
 ```
 
-#### `update(data: { user: PipebackUser }): void`
-Update user information dynamically.
+#### `navigate(section: string, param?: string): void`
+Navigate to a specific section of the messenger.
+
+**Available sections:**
+- `'home'` - Navigate to home
+- `'messages'` - Navigate to messages
+- `'help'` - Navigate to help center
+- `'news'` - Navigate to product updates
+- `'newMessage'` - Start a new conversation (optional: prefill text)
+- `'helpArticle'` - Open help article (requires article UUID)
+- `'newsPost'` - Open news post (requires post UUID)
 
 ```typescript
-pipeback.update({
-  user: {
-    id: 'new-user-id',
-    name: 'New Name',
-    email: 'new@email.com',
-    attributes: {
-      plan: 'enterprise'
-    }
-  }
-});
-```
+// Navigate to home
+pipeback.navigate('home');
 
-#### `isReady(): boolean`
-Check if the widget is ready to use.
+// Navigate to messages
+pipeback.navigate('messages');
 
-```typescript
-if (pipeback.isReady()) {
-  pipeback.open();
-}
-```
+// Navigate to help center
+pipeback.navigate('help');
 
-#### `shutdown(): void`
-Cleanup and remove the widget completely.
+// Navigate to product updates
+pipeback.navigate('news');
 
-```typescript
-pipeback.shutdown();
+// Start new message with prefilled text
+pipeback.navigate('newMessage', 'I need help with billing');
+
+// Open specific help article
+pipeback.navigate('helpArticle', 'article-uuid');
+
+// Open specific news post
+pipeback.navigate('newsPost', 'post-uuid');
 ```
 
 ## User Attributes
@@ -446,7 +275,6 @@ const config: PipebackConfig = {
 };
 
 const pipeback: PipebackInstance = createPipeback(config);
-await pipeback.init();
 ```
 
 ## License
